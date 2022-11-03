@@ -104,15 +104,25 @@ function AuthContextProvider(props) {
     }
 
     auth.loginUser = async function(email, password) {
-        const response = await api.loginUser(email, password);
-        if (response.status === 200) {
+        try{
+            const response = await api.loginUser(email, password);
+            if (response.status === 200) {
+                authReducer({
+                    type: AuthActionType.LOGIN_USER,
+                    payload: {
+                        user: response.data.user
+                    }
+                })
+                history.push("/");
+            }
+        }catch(e){
             authReducer({
-                type: AuthActionType.LOGIN_USER,
+                type: AuthActionType.DENY_USER,
                 payload: {
-                    user: response.data.user
+                    message: e.response.data.errorMessage
                 }
             })
-            history.push("/");
+            return false;
         }
     }
 

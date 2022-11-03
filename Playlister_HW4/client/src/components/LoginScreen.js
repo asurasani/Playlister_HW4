@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState, React } from 'react';
 import AuthContext from '../auth'
 
 import Copyright from './Copyright'
@@ -15,19 +15,37 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import Modal from '@mui/material/Modal';
+import AlertTitle from '@mui/material/AlertTitle';
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
 
 export default function LoginScreen() {
     const { auth } = useContext(AuthContext);
+    const [open, setOpen] = useState(false);
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        auth.loginUser(
+        setOpen(auth.loginUser(
             formData.get('email'),
             formData.get('password')
-        );
+        )?handleOpen:null);
 
     };
+    const handleClose = () => setOpen(false);
+    const handleOpen = () => setOpen(true);
 
     return (
         <Grid container component="main" sx={{ height: '100vh' }}>
@@ -95,6 +113,21 @@ export default function LoginScreen() {
                         >
                             Sign In
                         </Button>
+                        <Modal
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                            >
+                            <Box sx={style}>
+                            <Button onClick={handleClose}>X</Button>
+                                <Alert severity="warning">
+                                    <AlertTitle>Warning</AlertTitle>
+                                    {console.log(auth.message)}
+                                    {auth.message}
+                                </Alert>
+                            </Box>
+                        </Modal>
                         <Grid container>
                             <Grid item xs>
                                 <Link href="#" variant="body2">
